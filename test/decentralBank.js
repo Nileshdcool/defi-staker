@@ -66,8 +66,8 @@ contract('DecentralBank', ([owner, customer]) => {
             assert.equal(result.toString(), tokens('100'), 'customer mock balance before staking');
 
             // check staking for custome 100 tokens
-            await teather.approve(decentralBank.address, tokens('100'), {from: customer})
-            await decentralBank.depositTokens(tokens('100'),{from:customer});
+            await teather.approve(decentralBank.address, tokens('100'), { from: customer })
+            await decentralBank.depositTokens(tokens('100'), { from: customer });
 
             // check updated balance of customer
 
@@ -82,6 +82,32 @@ contract('DecentralBank', ([owner, customer]) => {
             // isStaking balance
             result = await decentralBank.isStaked(customer);
             assert.equal(result.toString(), 'true', 'customer is staking status after staking')
+
+            // issue tokens
+
+            await decentralBank.issueTokens({ from: owner });
+
+            // ensure only owner can issue tokens
+            await decentralBank.issueTokens({ from: customer }).should.be.rejected;
+
+            // Unstake Tokens
+
+            await decentralBank.unStakeTokens({ from: customer });
+
+            // check unstaking balances
+
+            result = await teather.balanceOf(customer);
+            assert.equal(result.toString(), tokens('100'), 'customer mock wallet after unstaking')
+
+            // check updated balance of decentrrak bank 
+
+            result = await teather.balanceOf(decentralBank.address);
+            assert.equal(result.toString(), tokens('0'), 'decentral bank mock wallet after unstaking')
+
+            // isStaking balance
+            result = await decentralBank.isStaked(customer);
+            assert.equal(result.toString(), 'false', 'customer is staking status after unstaking')
+
         })
     })
 });

@@ -1,8 +1,8 @@
 {
-  "name": "defi-tutorial",
+  "name": "defi-staker",
   "version": "0.1.0",
-  "description": "DeFi Token Staking App",
-  "author": "c-money",
+  "description": "defi staking application for any new tokens",
+  "author": "nilesh sukalikar",
   "dependencies": {
     "@types/jest": "^26.0.24",
     "@types/node": "^16.3.1",

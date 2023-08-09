@@ -26,6 +26,7 @@ class App extends Component {
     async loadBlockchainData() {
         const web3 = window.web3;
         const account = await web3.eth.getAccounts();
+        console.log(account);
         this.setState({ account: account[0] });
         const networkID = await web3.eth.net.getId();
         // load teather Contract
@@ -34,7 +35,7 @@ class App extends Component {
             const teather = new web3.eth.Contract(Teather.abi, teatherData.address);
             this.setState({ teather });
             let teatherBalance = await teather.methods.balanceOf(this.state.account).call();
-            this.setState({ balance: teatherBalance.toString() });
+            this.setState({ teatherBalance: teatherBalance.toString() });
             console.log({ balance: teatherBalance.toString() });
         } else {
             window.alert('Error, teather contract not deployed');
@@ -46,7 +47,7 @@ class App extends Component {
             const rwd = new web3.eth.Contract(RWD.abi, rwdData.address);
             this.setState({ rwd });
             let rwdBalance = await rwd.methods.balanceOf(this.state.account).call();
-            this.setState({ balance: rwdBalance.toString() });
+            this.setState({ rwdBalance: rwdBalance.toString() });
             console.log({ balance: rwdBalance.toString() });
         } else {
             window.alert('Error, rwd contract not deployed');
@@ -55,6 +56,7 @@ class App extends Component {
         // load decentral bank Contract
         const decentralBankData = DecentralBank.networks[networkID];
         if (decentralBankData) {
+            debugger;
             const decentralBank = new web3.eth.Contract(DecentralBank.abi, decentralBankData.address);
             this.setState({ decentralBank });
             let stakingBalance = await decentralBank.methods.stakingBalance(this.state.account).call();
@@ -64,6 +66,37 @@ class App extends Component {
             window.alert('Error, decentralbank contract not deployed');
         }
         this.setState({ loading: false })
+    }
+
+    //two functions one that stakes and unstake 
+
+
+    //staking function
+
+    stakeTokens = (amount) => {
+        debugger;
+        this.setState({ loading: true });
+        this.state.teather.methods.approve(this.state.decentralBank._address, amount).send({ from: this.state.account }).on('transactionHash', (hash) => {
+            this.state.decentralBank
+                .methods
+                .depositTokens(amount)
+                .send({ from: this.state.account })
+                .on('transactionHash', (hash) => {
+                    this.setState({ loading: false });
+                });
+        });
+    }
+
+    unstakeTokens = () => {
+        debugger;
+        this.setState({ loading: true });
+            this.state.decentralBank
+                .methods
+                .unStakeTokens()
+                .send({ from: this.state.account })
+                .on('transactionHash', (hash) => {
+                    this.setState({ loading: false });
+                });
     }
 
     constructor(props) {
@@ -81,8 +114,17 @@ class App extends Component {
     }
     render() {
         let content;
-        {this.state.loading ? content = <p id="loader" className="text-center" 
-        style={{margin:'30px'}}>Loading Please...</p> : content = <Main></Main>}
+        {
+            this.state.loading ? content = <p id="loader" className="text-center"
+                style={{ margin: '30px' }}>Loading Please...</p> : content =
+            <Main
+                teatherBalance={this.state.teatherBalance}
+                rwdBalance={this.state.rwdBalance}
+                stakingBalance={this.state.stakingBalance}
+                stakeTokens={this.stakeTokens}
+                unstakeTokens= {this.unstakeTokens}>
+            </Main>
+        }
         return (
             <div>
                 <Navbar account={this.state.account}></Navbar>
@@ -92,7 +134,7 @@ class App extends Component {
                             className="col-lg-12 ml-auto mr-auto"
                             style={{ maxWidth: '600px', minHeight: '100vm' }}>
                             <div>
-                              {content}
+                                {content}
                             </div>
                         </main>
                     </div>

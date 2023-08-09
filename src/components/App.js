@@ -5,6 +5,7 @@ import Teather from '../truffle_abis/Teather.json';
 import RWD from '../truffle_abis/RWD.json';
 import DecentralBank from '../truffle_abis/DecentralBank.json';
 import Main from "./Main";
+import ParticleSettings from "./ParticleSettings";
 
 class App extends Component {
 
@@ -99,6 +100,8 @@ class App extends Component {
                 });
     }
 
+    
+
     constructor(props) {
         super(props);
         this.state = {
@@ -116,7 +119,7 @@ class App extends Component {
         let content;
         {
             this.state.loading ? content = <p id="loader" className="text-center"
-                style={{ margin: '30px' }}>Loading Please...</p> : content =
+                style={{ margin: '30px', color:'white' }}>Loading Please...</p> : content =
             <Main
                 teatherBalance={this.state.teatherBalance}
                 rwdBalance={this.state.rwdBalance}
@@ -126,7 +129,11 @@ class App extends Component {
             </Main>
         }
         return (
-            <div>
+            <div className="App" style={{position:'relative'}}>
+                <div style={{position:'absolute'}}>
+                <ParticleSettings></ParticleSettings>
+                </div>
+               
                 <Navbar account={this.state.account}></Navbar>
                 <div className="container-fluid mt-5">
                     <div className="row">
